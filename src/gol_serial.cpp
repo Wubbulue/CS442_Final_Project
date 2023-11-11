@@ -1,1 +1,193 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+#include "gol.hpp"
+
+void evolve(bool* A, bool* A_old, int nrows, int ncols) {
+    
+}
+// get the number of neighbors alive for a given cell (row/col)
+unsigned int get_num_neighbors_alive(bool* A, int row, int col, int nrows, int ncols) {
+    unsigned int numAliveCells = 0;
+    // number of rows and columns in A; will be used to help
+    // loop around the grid if our cell is at a boundary.
+    if (row == 0) {
+        if (col == 0) {
+            // can't check directly to the left or up
+
+            // checking right
+            numAliveCells += (A[(row)*ncols + (col+1)] ? 1 : 0);
+            //checking down
+            numAliveCells += (A[(row + 1)*ncols + col] ? 1 : 0);
+            // checking down-right
+            numAliveCells += (A[(row + 1)*ncols + (col + 1)] ? 1 : 0);
+            // checking loop-around cells
+            // checking "left"
+            numAliveCells += (A[(row)*ncols + (ncols - 1)] ? 1 : 0);
+            // checking "up"
+            numAliveCells += (A[(nrows - 1)*ncols + (col)] ? 1 : 0);
+            //checking "left-up" (bottom-right on grid)
+            numAliveCells += (A[(nrows - 1)*ncols + (ncols - 1)] ? 1 : 0);
+            // checking "left-down"
+            numAliveCells += (A[(row + 1)*ncols + (ncols - 1)] ? 1 : 0);
+            // checking "right-up"
+            numAliveCells += (A[(nrows - 1)*ncols + (col + 1)] ? 1 : 0);
+        } else if (col == ncols - 1) {
+            // can't check anywhere directly to the right or up
+
+            // checking left
+            numAliveCells += (A[(row)*ncols + (col - 1)] ? 1 : 0);
+            numAliveCells += (A[(row + 1)*ncols + (col)] ? 1 : 0);
+            // checking down-left
+            numAliveCells += (A[(row + 1)*ncols + (col - 1)] ? 1 : 0);
+
+            // checking "loop-around" cells
+            // checking "up"
+            numAliveCells += (A[(nrows - 1)*ncols + (col)] ? 1 : 0);
+            // checking "right"
+            numAliveCells += (A[(row)*ncols + (0)] ? 1 : 0);
+            // checking "right-up" (bottom-left)
+            numAliveCells += (A[(nrows - 1)*ncols + (0)] ? 1 : 0);
+            // checking "left-up"
+            numAliveCells += (A[(nrows - 1)*ncols + (col - 1)] ? 1 : 0);
+            // checking "down-right"
+            numAliveCells += (A[(row + 1)*ncols + (0)] ? 1 : 0);
+        } else {
+            // col not at risk of going out of bounds
+            // can't check directly up
+            numAliveCells += (A[(row)*ncols + (col + 1)] ? 1 : 0);
+            numAliveCells += (A[(row + 1)*ncols + (col + 1)] ? 1 : 0);
+            numAliveCells += (A[(row)*ncols + (col - 1)] ? 1 : 0);
+            numAliveCells += (A[(row + 1)*ncols + (col - 1)] ? 1 : 0);
+            numAliveCells += (A[(row + 1)*ncols + (col)] ? 1 : 0);
+
+            // checking "up"
+            numAliveCells += (A[(nrows - 1)*ncols + (col)] ? 1 : 0);
+            // checking "right-up"
+            numAliveCells += (A[(nrows - 1)*ncols + (col + 1)] ? 1 : 0);
+            //checking "left-up"
+            numAliveCells += (A[(nrows - 1)*ncols + (col - 1)] ? 1 : 0);
+        }
+    } else if (row == nrows - 1) {
+        if (col == 0) {
+            // can't check directly to the left or down
+
+            // checking up-right
+            numAliveCells += (A[(row - 1)*ncols + (col + 1)] ? 1 : 0);
+            // checking up
+            numAliveCells += (A[(row - 1)*ncols + (col)] ? 1 : 0);
+            numAliveCells += (A[(row)*ncols + (col + 1)] ? 1 : 0);
+            // checking "left"
+            numAliveCells += (A[(row)*ncols + (ncols - 1)] ? 1 : 0);
+            // checking "down"
+            numAliveCells += (A[(0)*ncols + (col)] ? 1 : 0);
+            // checking "down-right"
+            numAliveCells += (A[(0)*ncols + (col + 1)] ? 1 : 0);
+            // checking "down-left" (top-right)
+            numAliveCells += (A[(0)*ncols + (ncols - 1)] ? 1 : 0);
+            // checking "left-up"
+            numAliveCells += (A[(row - 1)*ncols + (ncols - 1)] ? 1 : 0);
+        } else if (col == ncols - 1) {
+            // can't check directly to the right or down
+            numAliveCells += (A[(row - 1)*ncols + (col - 1)] ? 1 : 0);
+            numAliveCells += (A[(row - 1)*ncols + (col)] ? 1 : 0);
+            numAliveCells += (A[(row)*ncols + (col - 1)] ? 1 : 0);
+
+            // checking "right"
+            numAliveCells += (A[(row)*ncols + (0)] ? 1 : 0);
+            // checking "down"
+            numAliveCells += (A[(0)*ncols + (col)] ? 1 : 0);
+            // checking "down-right" (upper-left corner)
+            numAliveCells += (A[(0)*ncols + (0)] ? 1 : 0);
+            // checking "down-left"
+            numAliveCells += (A[(0)*ncols + (col - 1)] ? 1 : 0);
+            // checking "up-right"
+            numAliveCells += (A[(row - 1)*ncols + (0)] ? 1 : 0);
+
+        } else {
+            // col not at risk of going out of bounds
+            // can't check down directly
+            numAliveCells += (A[(row)*ncols + (col + 1)] ? 1 : 0);
+            numAliveCells += (A[(row - 1)*ncols + (col + 1)] ? 1 : 0);
+            numAliveCells += (A[(row)*ncols + (col - 1)] ? 1 : 0);
+            numAliveCells += (A[(row - 1)*ncols + (col - 1)] ? 1 : 0);
+            numAliveCells += (A[(row - 1)*ncols + (col)] ? 1 : 0);
+
+            // checking "down"
+            numAliveCells += (A[(0)*ncols + (col)] ? 1 : 0);
+            // checking "down-left"
+            numAliveCells += (A[(0)*ncols + (col - 1)] ? 1 : 0);
+            // checking "down-right"
+            numAliveCells += (A[(0)*ncols + (col + 1)] ? 1 : 0);
+
+        }
+    } else if (col == 0) {
+        // row conditions have been checked already
+        // can't check directly left
+        numAliveCells += (A[(row)*ncols + (col + 1)] ? 1 : 0);
+        numAliveCells += (A[(row + 1)*ncols + (col)] ? 1 : 0);
+        numAliveCells += (A[(row + 1)*ncols + (col + 1)] ? 1 : 0);
+        numAliveCells += (A[(row - 1)*ncols + (col)] ? 1 : 0);
+        numAliveCells += (A[(row - 1)*ncols + (col + 1)] ? 1 : 0);
+
+        // checking "left"
+        numAliveCells += (A[(row)*ncols + (ncols - 1)] ? 1 : 0);
+        // checking "down-left"
+        numAliveCells += (A[(row + 1)*ncols + (ncols - 1)] ? 1 : 0);
+        // checking "up-left"
+        numAliveCells += (A[(row - 1)*ncols + (ncols - 1)] ? 1 : 0);
+    } else if (col == ncols - 1) {
+        // row conditions have been checked already
+        // can't check right
+        numAliveCells += (A[(row)*ncols + (col - 1)] ? 1 : 0);
+        numAliveCells += (A[(row + 1)*ncols + (col)] ? 1 : 0);
+        numAliveCells += (A[(row + 1)*ncols + (col - 1)] ? 1 : 0);
+        numAliveCells += (A[(row - 1)*ncols + (col)] ? 1 : 0);
+        numAliveCells += (A[(row - 1)*ncols + (col - 1)] ? 1 : 0);
+
+        // checking "right"
+        numAliveCells += (A[(row)*ncols + (0)] ? 1 : 0);
+        // checking "down-right"
+        numAliveCells += (A[(row + 1)*ncols + (0)] ? 1 : 0);
+        // checking "up-right"
+        numAliveCells += (A[(row - 1)*ncols + (0)] ? 1 : 0);
+    } else {
+        // no risk of going OOB in any direction
+        numAliveCells += (A[(row)*ncols + (col - 1)] ? 1 : 0);
+        numAliveCells += (A[(row)*ncols + (col + 1)] ? 1 : 0);
+        numAliveCells += (A[(row - 1)*ncols + (col)] ? 1 : 0);
+        numAliveCells += (A[(row + 1)*ncols + (col)] ? 1 : 0);
+        numAliveCells += (A[(row - 1)*ncols + (col - 1)] ? 1 : 0);
+        numAliveCells += (A[(row - 1)*ncols + (col + 1)] ? 1 : 0);
+        numAliveCells += (A[(row + 1)*ncols + (col - 1)] ? 1 : 0);
+        numAliveCells += (A[(row + 1)*ncols + (col + 1)] ? 1 : 0);
+    }
+    return numAliveCells;
+}
+// run will evolve, copy data to A_old, and save matrix (if SAVE_TO_FILE flag), then repeat.
+// if DEBUG then print matrix every iteration
+void run(bool** A, int num_iterations, int nrows, int ncols, bool SAVE_TO_FILE, bool DEBUG);
+
+
+int main(int argc, char** argv) {
+    // can remove this main() later, just testing stuff for now
+    int nrows = 4;
+    int ncols = 4;
+    bool* A = new bool[nrows*ncols];
+    for (int i=0; i < nrows; i++) {
+        for (int j=0; j < ncols; j++) {
+            A[i*ncols + j] = true;
+        }
+    }
+    unsigned int nAlive;
+    for (int i=0; i < nrows; i++) {
+        for (int j=0; j < ncols; j++) {
+            nAlive = get_num_neighbors_alive(A, i, j, nrows, ncols);
+            printf("nAlive(%d,%d): %d\n", i, j, nAlive);
+        }
+    }
+    delete[] A;
+    return 0;
+}
 
