@@ -1,13 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <cstring>
 
 #include "gol.hpp"
+#include "utils.hpp"
 
 
 // run will evolve, copy data to A_old, and save matrix (if SAVE_TO_FILE flag), then repeat.
 // if DEBUG then print matrix every iteration
-void run(bool** A, int num_iterations, int nrows, int ncols, bool SAVE_TO_FILE, bool DEBUG);
+void run(bool* A, int num_iterations, int nrows, int ncols, bool SAVE_TO_FILE, bool DEBUG, std::string save_file) {
+    unsigned int size_A = nrows*ncols;
+    bool* A_old = new bool[size_A];
+    memcpy(A_old, A, size_A*sizeof(bool));
+    for (int i=0; i < num_iterations; i++) {
+        if (SAVE_TO_FILE) {
+            to_file(save_file, A, nrows, ncols);
+        }
+        if (DEBUG) {
+            print_matrix(A, nrows, ncols);
+        }
+        evolve(A, A_old, nrows, ncols);
+        memcpy(A_old, A, size_A*sizeof(bool));
+    }
+    delete[] A_old;
+}
 
 
 void evolve(bool* A, bool* A_old, int nrows, int ncols) {
@@ -35,6 +51,7 @@ void evolve(bool* A, bool* A_old, int nrows, int ncols) {
         }
     }
 }
+
 
 // get the number of neighbors alive for a given cell (row/col)
 unsigned int get_num_neighbors_alive(bool* A, int row, int col, int nrows, int ncols) {
@@ -203,16 +220,15 @@ int main(int argc, char** argv) {
     bool* A = new bool[nrows*ncols];
     for (int i=0; i < nrows; i++) {
         for (int j=0; j < ncols; j++) {
-            A[i*ncols + j] = true;
+            A[i*ncols + j] = false;
         }
     }
-    unsigned int nAlive;
-    for (int i=0; i < nrows; i++) {
-        for (int j=0; j < ncols; j++) {
-            nAlive = get_num_neighbors_alive(A, i, j, nrows, ncols);
-            printf("nAlive(%d,%d): %d\n", i, j, nAlive);
-        }
-    }
+    A[1*ncols + 1] = true;
+    A[1*ncols + 2] = true;
+    A[2*ncols + 1] = true;
+    A[2*ncols + 2] = true;
+    int n_iterations = 10;
+    run(A, n_iterations, nrows, ncols, false, true); 
     delete[] A;
     return 0;
 }
