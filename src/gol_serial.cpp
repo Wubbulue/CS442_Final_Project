@@ -4,9 +4,38 @@
 
 #include "gol.hpp"
 
+
+// run will evolve, copy data to A_old, and save matrix (if SAVE_TO_FILE flag), then repeat.
+// if DEBUG then print matrix every iteration
+void run(bool** A, int num_iterations, int nrows, int ncols, bool SAVE_TO_FILE, bool DEBUG);
+
+
 void evolve(bool* A, bool* A_old, int nrows, int ncols) {
-    
+    unsigned int numAliveNeighbors;
+    for (int i = 0; i < nrows; i++) {
+        for (int j = 0; j < ncols; j++) {
+            numAliveNeighbors = get_num_neighbors_alive(A_old, i, j, nrows, ncols);
+            if (A_old[i*ncols + j]) {
+                // current cell is alive
+                if (numAliveNeighbors < 2 || numAliveNeighbors > 3) {
+                    // cell doesn't have 2 or 3 neighbors, dies
+                    A[i*ncols + j] = false;
+                } else {
+                    A[i*ncols + j] = true;
+                }
+            } else {
+                // current cell is dead
+                if (numAliveNeighbors == 3) {
+                    // cell has 3 alive neighbors, can come alive
+                    A[i*ncols + j] = true;
+                } else {
+                    A[i*ncols + j] = false;
+                }
+            }
+        }
+    }
 }
+
 // get the number of neighbors alive for a given cell (row/col)
 unsigned int get_num_neighbors_alive(bool* A, int row, int col, int nrows, int ncols) {
     unsigned int numAliveCells = 0;
@@ -165,9 +194,6 @@ unsigned int get_num_neighbors_alive(bool* A, int row, int col, int nrows, int n
     }
     return numAliveCells;
 }
-// run will evolve, copy data to A_old, and save matrix (if SAVE_TO_FILE flag), then repeat.
-// if DEBUG then print matrix every iteration
-void run(bool** A, int num_iterations, int nrows, int ncols, bool SAVE_TO_FILE, bool DEBUG);
 
 
 int main(int argc, char** argv) {
