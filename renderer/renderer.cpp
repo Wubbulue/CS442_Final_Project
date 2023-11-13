@@ -5,9 +5,9 @@
 #include <bitset>
 
 #define MAT_PATH "../example.mat"
-#define OUT_VIDEO_PATH "../example_video.avi"
+#define OUT_VIDEO_PATH "../example_video.mp4"
 
-#define VIDEO_FPS 1.0
+#define VIDEO_FPS 10.0
 
 bool is_big_endian(void)
 {
@@ -64,13 +64,13 @@ int main(int argc, char** argv) {
 		frames.push_back(currentFrame);
 	}
 
-	cv::VideoWriter video(OUT_VIDEO_PATH, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'),10,cv::Size(numCols,numRows));
+	cv::VideoWriter video(OUT_VIDEO_PATH, cv::VideoWriter::fourcc('M', 'P', '4', 'V'),VIDEO_FPS,cv::Size(numCols,numRows));
 
 
 	for (auto& frame : frames) {
 		cv::Mat bgrImage;
 		cv::cvtColor(frame, bgrImage, cv::COLOR_GRAY2BGR);
-		video.write(frame);
+		video.write(bgrImage);
 	}
 
 	video.release();

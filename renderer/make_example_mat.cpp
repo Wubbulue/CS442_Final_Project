@@ -15,7 +15,10 @@ int main(int argc, char** argv) {
 
 
 	//Convert shrek to a series of binary images with different thresholds
-	std::vector<int> thresholds = { 20,30,50,80,100,120,150,170,190 };
+	std::vector<int> thresholds;
+	for (int i = 1; i < 255; i++) {
+		thresholds.push_back(i);
+	}
 	std::vector<cv::Mat> shrekBinaries(thresholds.size());
 	for (int i = 0; i < thresholds.size(); i++) {
 		cv::threshold(shrekGray, shrekBinaries[i], thresholds[i], 255, cv::THRESH_BINARY);
