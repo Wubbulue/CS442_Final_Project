@@ -5,10 +5,8 @@
 #include <fstream>
 
 //This is a path to an image that we will convert to a mat file
-//#define IMAGE_PATH "../shrek_bigger.jpg"
-#define IMAGE_PATH "../finn.png"
-#define OUT_PATH "../shrek.png"
-#define OUT_MAT_PATH "../other.mat"
+#define IMAGE_PATH "../shrek.jpg"
+#define OUT_MAT_PATH "../example.mat"
 
 
 int main(int argc, char** argv) {
@@ -18,20 +16,15 @@ int main(int argc, char** argv) {
 
 	//Convert shrek to a series of binary images with different thresholds
 	std::vector<int> thresholds = { 20,30,50,80,100,120,150,170,190 };
-	//std::vector<int> thresholds = { 20 };
 	std::vector<cv::Mat> shrekBinaries(thresholds.size());
 	for (int i = 0; i < thresholds.size(); i++) {
 		cv::threshold(shrekGray, shrekBinaries[i], thresholds[i], 255, cv::THRESH_BINARY);
 	}
 
-
-
-	std::ofstream outMat(OUT_MAT_PATH);
+	std::ofstream outMat(OUT_MAT_PATH, std::ios::binary);
 
 	const uint32_t numFrames = thresholds.size();
 	const uint32_t numRows = shrekGray.rows;
-
-
 	const uint32_t numCols = shrekGray.cols;
 
 	//write a multiple of 8 for cols
@@ -46,11 +39,8 @@ int main(int argc, char** argv) {
 	outMat.write(reinterpret_cast<const char*>(&numRows), sizeof(numRows));
 	outMat.write(reinterpret_cast<const char*>(&numColsActual), sizeof(numColsActual));
 
-	FILE* make_mat = fopen("../make_mat.txt","w");
-
 	for (int frame = 0; frame < numFrames; frame++) {
 		auto& currentFrame = shrekBinaries[frame];
-		int bytesPerFrame = 0;
 		for (int row = 0; row < numRows; row++) {
 			std::vector<uint8_t> binaryRow (numColsActual,255);
 			for (int col = 0; col < numCols; col++) {
@@ -68,22 +58,11 @@ int main(int argc, char** argv) {
 
 				rowBytes[numByte] = byte;
 			}
-			for (auto b : rowBytes) {
-				//printf("%d,", b);
-				std::fprintf(make_mat, "%d,", b);
-			}
-			//printf("\n");
-			std::fprintf(make_mat, "\n");
 			outMat.write(reinterpret_cast<const char*>(rowBytes.data()), rowBytes.size());
-			//outMat.write(reinterpret_cast<const char*>(binaryRow.data()), binaryRow.size());
-			bytesPerFrame += rowBytes.size();
 		}
-		//printf("Bytes per frame: %d\n", bytesPerFrame);
 	}
 
 	outMat.close();
-	fclose(make_mat);
-
 
 	return 0;
 
