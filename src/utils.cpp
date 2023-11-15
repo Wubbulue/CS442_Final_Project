@@ -17,13 +17,12 @@ unsigned char to_byte(bool b[8])
 }
 
 
-
 void from_file(std::string fname, bool* A, int nrows, int ncols){
     std::ifstream in{fname, std::ios::in | std::ios::binary };
     std::vector<char> contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     //now turn contents into initial board A
     printf("byte is %d\n " , contents[0]);
-    printf("size vector is %ld\n ", contents.size());
+    printf("size vector is %ld\n", contents.size());
     int k = 0;
     
     for(int i = 0; i < contents.size(); i++){
@@ -42,8 +41,13 @@ void from_file(std::string fname, bool* A, int nrows, int ncols){
 }
 
 
+void initialize_file(std::string fname, int num_iterations, int nrows, int ncols){ 
+    // TODO
+}
 
-void to_file(std::string fname, bool* A, int nrows, int ncols) {
+
+void append_to_file(std::string fname, bool* A, int nrows, int ncols) {
+    // TODO: change to append to file instead of creating new file
     bool* fromArray = new bool[8];
     int k = 0; 
     ofstream MyWriteFile(fname);
@@ -82,32 +86,3 @@ void print_matrix(bool* A, int nrows, int ncols) {
     }    
     printf("\n");
 }
-
-
-
-// will remove once everything put togather just used for testing
-int main(int argc, char *argv[] ){
-
-  int n = 4;
-  int nrows = 1024;
-  int ncols = 1024;
-  bool* A = new bool[nrows*ncols];
-  A[0] = true;
-  A[1] = true;
-  A[2] = false;
-  A[3] = true;
-  A[4] = false;
-  A[5] = true;
-  A[6] = false;
-  A[7] = false;
-  
-  bool* testBytes = new bool[8];
-  
-  to_file("filename.txt",A,nrows,ncols);
-  
-  from_file("filename.txt",A,nrows,ncols);
-  
-  print_matrix(A,nrows,ncols);
-}
-
-

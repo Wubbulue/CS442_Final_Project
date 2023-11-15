@@ -12,9 +12,12 @@ void run(bool* A, int num_iterations, int nrows, int ncols, bool SAVE_TO_FILE, b
     unsigned int size_A = nrows*ncols;
     bool* A_old = new bool[size_A];
     memcpy(A_old, A, size_A*sizeof(bool));
+    if (SAVE_TO_FILE) {
+        initialize_file(save_file, num_iterations, nrows, ncols);
+    }
     for (int i=0; i < num_iterations; i++) {
         if (SAVE_TO_FILE) {
-            to_file(save_file, A, nrows, ncols);
+            append_to_file(save_file, A, nrows, ncols);
         }
         if (DEBUG) {
             print_matrix(A, nrows, ncols);
@@ -211,25 +214,3 @@ unsigned int get_num_neighbors_alive(bool* A, int row, int col, int nrows, int n
     }
     return num_alive_cells;
 }
-
-
-int main(int argc, char** argv) {
-    // can remove this main() later, just testing stuff for now
-    int nrows = 4;
-    int ncols = 4;
-    bool* A = new bool[nrows*ncols];
-    for (int i=0; i < nrows; i++) {
-        for (int j=0; j < ncols; j++) {
-            A[i*ncols + j] = false;
-        }
-    }
-    A[1*ncols + 1] = true;
-    A[1*ncols + 2] = true;
-    A[2*ncols + 1] = true;
-    A[2*ncols + 2] = true;
-    int n_iterations = 10;
-    run(A, n_iterations, nrows, ncols, false, true); 
-    delete[] A;
-    return 0;
-}
-
