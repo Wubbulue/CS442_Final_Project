@@ -17,12 +17,14 @@ int main(int argc, char** argv) {
     A[2*ncols + 1] = true;
     A[2*ncols + 2] = true;
     int n_iterations = 10;
-    run(A, n_iterations, nrows, ncols, false, true);
+    
+    initialize_file("filename.txt", n_iterations,nrows,ncols);
+    run(A, n_iterations, nrows, ncols, true, false);
  
     printf("\nTESTING UTILS (FILE SAVE/LOAD)\n\n");
     bool* testBytes = new bool[8];
     append_to_file("filename.txt",A,nrows,ncols);
-    from_file("filename.txt",A,nrows,ncols);
+    //from_file("filename.txt",A,nrows,ncols);
     print_matrix(A,nrows,ncols);
     delete[] A;
     return 0;

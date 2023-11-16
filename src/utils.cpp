@@ -17,7 +17,13 @@ unsigned char to_byte(bool b[8])
 }
 
 
+
+void initilize_Board_From_File(std::string fname, bool* A, int nrows, int ncols){
+
+}
+
 void from_file(std::string fname, bool* A, int nrows, int ncols){
+	printf("reading from file \n");
     std::ifstream in{fname, std::ios::in | std::ios::binary };
     std::vector<char> contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     //now turn contents into initial board A
@@ -43,14 +49,35 @@ void from_file(std::string fname, bool* A, int nrows, int ncols){
 
 void initialize_file(std::string fname, int num_iterations, int nrows, int ncols){ 
     // TODO
+    ofstream MyWriteFile(fname);
+    printf("initlizing file \n");
+    
+    MyWriteFile << "num_iterations ";
+    MyWriteFile << num_iterations;
+    MyWriteFile << "\n";
+    
+    
+    MyWriteFile << "nrows ";
+    MyWriteFile << nrows;
+    MyWriteFile << "\n";
+    
+    MyWriteFile << "ncols " ;
+    MyWriteFile << ncols;
+    MyWriteFile <<"\n";
 }
 
 
 void append_to_file(std::string fname, bool* A, int nrows, int ncols) {
     // TODO: change to append to file instead of creating new file
+    printf("appending to file\n");
     bool* fromArray = new bool[8];
     int k = 0; 
-    ofstream MyWriteFile(fname);
+    
+    std::ofstream MyWriteFile;
+    MyWriteFile.open(fname,std::ios_base::app);
+    
+    
+    //ofstream MyWriteFile(fname);
     for (int i = 0; i < nrows; i++) {
     	for (int j = 0; j < ncols; j++) {
     		if (k == 7){
