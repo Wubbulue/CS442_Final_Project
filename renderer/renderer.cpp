@@ -4,10 +4,11 @@
 #include <fstream>
 #include <bitset>
 
+//#define MAT_PATH "C:/Programming_projects/cs442/CS442_Final_Project/gol_implementation/build/gol_serial/out_test.mat"
 #define MAT_PATH "../example.mat"
 #define OUT_VIDEO_PATH "../example_video.mp4"
 
-#define VIDEO_FPS 10.0
+#define VIDEO_FPS 2
 
 bool is_big_endian(void)
 {
@@ -42,7 +43,6 @@ int main(int argc, char** argv) {
 			for (int colByte = 0; colByte < numCols/8; colByte++) {
 				uint8_t byte;
 				matFile.read(reinterpret_cast<char*>(&byte), 1);
-				static int specialPrint = 150;
 				std::bitset<8> bits = byte;
 
 				if (!bigEndian) {

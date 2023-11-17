@@ -6,7 +6,7 @@
 // load contents from fname into A
 void from_file(std::string fname, bool* A, int nrows, int ncols);
 // initialize file with header, num_frames==num_iterations of GOL
-void initialize_file(std::string fname, int num_iterations, int nrows, int ncols);
+void initialize_file(std::string fname, uint32_t num_iterations, uint32_t nrows, uint32_t ncols);
 // store contents of A into the provided file
 void append_to_file(std::string fname, bool* A, int nrows, int ncols);
 // convert boolean arr to byte

@@ -47,54 +47,36 @@ void from_file(std::string fname, bool* A, int nrows, int ncols){
 }
 
 
-void initialize_file(std::string fname, int num_iterations, int nrows, int ncols){ 
-    // TODO
-    ofstream MyWriteFile(fname);
-    printf("initlizing file \n");
-    
-    MyWriteFile << "num_iterations ";
-    MyWriteFile << num_iterations;
-    MyWriteFile << "\n";
-    
-    
-    MyWriteFile << "nrows ";
-    MyWriteFile << nrows;
-    MyWriteFile << "\n";
-    
-    MyWriteFile << "ncols " ;
-    MyWriteFile << ncols;
-    MyWriteFile <<"\n";
+void initialize_file(std::string fname, uint32_t num_iterations, uint32_t nrows, uint32_t ncols){ 
+    ofstream outFile(fname,std::ios::binary);
+
+	outFile.write(reinterpret_cast<const char*>(&num_iterations), sizeof(uint32_t));
+    outFile.write(reinterpret_cast<const char*>(&nrows), sizeof(uint32_t));
+    outFile.write(reinterpret_cast<const char*>(&ncols), sizeof(uint32_t));
+
 }
 
 
 void append_to_file(std::string fname, bool* A, int nrows, int ncols) {
-    // TODO: change to append to file instead of creating new file
-    printf("appending to file\n");
     bool* fromArray = new bool[8];
     int k = 0; 
     
-    std::ofstream MyWriteFile;
-    MyWriteFile.open(fname,std::ios_base::app);
+    std::ofstream outFile;
+    outFile.open(fname,std::ios_base::app|std::ios::binary);
     
     
-    //ofstream MyWriteFile(fname);
     for (int i = 0; i < nrows; i++) {
-    	for (int j = 0; j < ncols; j++) {
-    		if (k == 7){
-    			k = 0;
-    			//write to file
-    			unsigned char c = to_byte(fromArray);
-    			printf("writing to file %d\n", c);
-    			MyWriteFile << c;    			
-    			//reset boolFromArray maybe?	
-    		}
-    		else{
-    			fromArray[k] = A[i*ncols + j];
-    			k = k + 1;
-    		}
+    	for (int byteCol = 0; byteCol < ncols/8; byteCol++) {
+            for (int bit = 0; bit < 8; bit++) {
+                fromArray[bit] = A[i * ncols + byteCol * 8 + bit];
+            }
+			uint8_t c = to_byte(fromArray);
+            outFile.write(reinterpret_cast<const char*>(&c), 1);
     	}
     }
-    MyWriteFile.close();
+
+    delete[] fromArray;
+    outFile.close();
 }
 
 

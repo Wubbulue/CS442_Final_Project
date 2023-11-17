@@ -1,4 +1,5 @@
 renderer/build/
+gol_implementation/build/
 *.mp4
 *.avi
 *.mat

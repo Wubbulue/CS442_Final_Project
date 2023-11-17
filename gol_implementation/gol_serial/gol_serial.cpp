@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <cstring>
 
-#include "gol.hpp"
-#include "utils.hpp"
+#include "gol_serial.hpp"
+#include <utils.hpp>
 
 
 // run will evolve, copy data to A_old, and save matrix (if SAVE_TO_FILE flag), then repeat.
