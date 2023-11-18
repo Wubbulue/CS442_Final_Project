@@ -13,7 +13,6 @@ int main(int argc, char** argv) {
     using std::chrono::time_point;
     using std::chrono::duration_cast;
     using std::chrono::milliseconds;
-    using namespace std::literals::chrono_literals;
 
 
     int nrows = 1024;
