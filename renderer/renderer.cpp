@@ -4,8 +4,8 @@
 #include <fstream>
 #include <bitset>
 
-//#define MAT_PATH "C:/Programming_projects/cs442/CS442_Final_Project/gol_implementation/build/gol_serial/out_test.mat"
-#define MAT_PATH "../example.mat"
+#define MAT_PATH "C:/Programming_projects/cs442/CS442_Final_Project/gol_implementation/build/gol_serial/out_test.mat"
+//#define MAT_PATH "../example.mat"
 #define OUT_VIDEO_PATH "../example_video.mp4"
 
 #define VIDEO_FPS 2

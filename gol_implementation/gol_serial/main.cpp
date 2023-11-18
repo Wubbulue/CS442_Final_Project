@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     auto gen = std::bind(std::uniform_int_distribution<>(0, 1), std::default_random_engine());
     for (int i=0; i < nrows; i++) {
         for (int j=0; j < ncols; j++) {
-            A[i*ncols + j] = std::rand() % 2;
+            A[i*ncols + j] = gen();
         }
     }
 
