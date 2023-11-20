@@ -18,18 +18,19 @@ int main(int argc, char** argv) {
     int nrows = 1024;
     int ncols = 1024;
     bool* A = new bool[nrows*ncols];
-    auto gen = std::bind(std::uniform_int_distribution<>(0, 1), std::default_random_engine());
+    std::mt19937 engine(123);
+    auto gen = std::bind(std::uniform_int_distribution<>(0, 1), engine);
     for (int i=0; i < nrows; i++) {
         for (int j=0; j < ncols; j++) {
             A[i*ncols + j] = gen();
         }
     }
 
-    const bool writeToFile = true;
+    const bool writeToFile = false;
 
     int n_iterations = 100;
 
-    printf("Running a GOL Simulation with %d rows, %d cols, and %d interations\n",256,256,n_iterations);
+    printf("Running a GOL Simulation with %d rows, %d cols, and %d interations\n",nrows,ncols,n_iterations);
 
     if (writeToFile) {
         printf("Warning, file writing is enabled, which could impact performance\n");
@@ -40,6 +41,7 @@ int main(int argc, char** argv) {
     if (writeToFile) {
 		initialize_file(out_filename, n_iterations,nrows,ncols);
     }
+
 
     time_point<Clock> start = Clock::now();
     run(A, n_iterations, nrows, ncols, writeToFile, false,out_filename);
