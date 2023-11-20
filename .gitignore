@@ -3,3 +3,4 @@ gol_implementation/build/
 *.mp4
 *.avi
 *.mat
+*.out
