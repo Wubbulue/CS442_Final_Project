@@ -1,4 +1,6 @@
 #include "gol_serial.hpp"
+#include "readin.hpp"
+
 #include <utils.hpp>
 #include <iostream>
 #include <random>
@@ -17,12 +19,24 @@ int main(int argc, char** argv) {
 
     int nrows = 1024;
     int ncols = 1024;
-    bool* A = new bool[nrows*ncols];
-    std::mt19937 engine(123);
-    auto gen = std::bind(std::uniform_int_distribution<>(0, 1), engine);
-    for (int i=0; i < nrows; i++) {
-        for (int j=0; j < ncols; j++) {
-            A[i*ncols + j] = gen();
+    
+    // TODO: assign these based on command line args 
+    bool gollyDensePattern = true;
+    const char *patternFilename = GOLLY_TEST_FILE_PATH;
+    
+    bool* A;
+
+    if (gollyDensePattern) {
+        A = loadPattern(nrows, ncols, patternFilename); 
+    }
+    else {
+        A = new bool[nrows*ncols];
+        std::mt19937 engine(123);
+        auto gen = std::bind(std::uniform_int_distribution<>(0, 1), engine);
+        for (int i=0; i < nrows; i++) {
+            for (int j=0; j < ncols; j++) {
+                A[i*ncols + j] = gen();
+            }
         }
     }
 
@@ -44,7 +58,7 @@ int main(int argc, char** argv) {
 
 
     time_point<Clock> start = Clock::now();
-    run(A, n_iterations, nrows, ncols, writeToFile, false,out_filename);
+    run(A, n_iterations, nrows, ncols, writeToFile, false, out_filename);
     time_point<Clock> end = Clock::now();
     milliseconds diff = duration_cast<milliseconds>(end - start);
     std::cout << "Simulation took: " << diff.count() << " miliseconds" << std::endl;
