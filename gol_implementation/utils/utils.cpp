@@ -6,6 +6,8 @@
 #include <iterator>
 #include <vector>
 
+#include "readin.hpp"
+
 using namespace std;
 unsigned char to_byte(bool b[8])
 {
@@ -29,7 +31,7 @@ void initialize_board_randomly(bool* A, int nrows, int ncols, int seed) {
 
 
 void initilize_board_from_file(std::string fname, bool* A, int nrows, int ncols){
-    A = loadPattern(nrows, ncols, fname); 
+    A = loadPattern(nrows, ncols, fname.c_str()); 
 }
 
 void from_file(std::string fname, bool* A, int nrows, int ncols){
