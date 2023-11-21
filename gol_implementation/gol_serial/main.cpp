@@ -9,6 +9,17 @@
 
 
 int main(int argc, char** argv) {
+    // parsing command-line args
+    int n_iter, n_dims, seed;
+    std::string file_path, save_file;
+    bool file_io_flag;
+    parse_args(argc, argv, n_iter, n_dims, file_path, file_io_flag, save_file, seed);
+    // print out to check
+    printf("n_iter: %d | n_dims: %d | seed: %d\n", n_iter, n_dims, seed);
+    std::cout << "file_path: " << file_path << std::endl;
+    std::cout << "file_io_flag: " << file_io_flag << std::endl;
+    std::cout << "save_file: " << save_file << std::endl;
+
 
     //Cpp chrono garbage
     using Clock = std::chrono::steady_clock;
@@ -17,32 +28,20 @@ int main(int argc, char** argv) {
     using std::chrono::milliseconds;
 
 
-    int nrows = 1024;
-    int ncols = 1024;
-    
-    // TODO: assign these based on command line args 
-    bool gollyDensePattern = true;
-    const char *patternFilename = GOLLY_TEST_FILE_PATH;
-    
-    bool* A;
-
-    if (gollyDensePattern) {
-        A = loadPattern(nrows, ncols, patternFilename); 
+    int nrows = n_dims;
+    int ncols = n_dims;
+    bool* A = new bool[nrows*ncols];
+    if (file_path == "") {
+        // no file given, random initialize
+        initialize_board_randomly(A, nrows, ncols, seed);
     }
     else {
-        A = new bool[nrows*ncols];
-        std::mt19937 engine(123);
-        auto gen = std::bind(std::uniform_int_distribution<>(0, 1), engine);
-        for (int i=0; i < nrows; i++) {
-            for (int j=0; j < ncols; j++) {
-                A[i*ncols + j] = gen();
-            }
-        }
+        initilize_board_from_file(file_path, A, nrows, ncols);
     }
 
-    const bool writeToFile = false;
+    const bool writeToFile = file_io_flag;
 
-    int n_iterations = 100;
+    int n_iterations = n_iter;
 
     printf("Running a GOL Simulation with %d rows, %d cols, and %d interations\n",nrows,ncols,n_iterations);
 

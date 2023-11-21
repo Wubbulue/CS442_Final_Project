@@ -3,6 +3,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <random>
+#include <functional>
+
 // load contents from fname into A
 void from_file(std::string fname, bool* A, int nrows, int ncols);
 // initialize file with header, num_frames==num_iterations of GOL
@@ -13,4 +16,9 @@ void append_to_file(std::string fname, bool* A, int nrows, int ncols);
 unsigned char to_byte(bool b[8]);
 // for debugging purposes
 void print_matrix(bool* A, int nrows, int ncols);
+// for parsing command-line args
+void parse_args(int argc, char *argv[], int& n_iter, int& n_dims, std::string& file_path,
+                bool& file_io_flag, std::string& save_file, int& seed);
+void initilize_board_from_file(std::string fname, bool* A, int nrows, int ncols);
+void initialize_board_randomly(bool* A, int nrows, int ncols, int seed);
 #endif

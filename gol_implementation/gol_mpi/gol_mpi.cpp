@@ -370,12 +370,11 @@ void getNeighborRanks(NeighborRanks* nRnks,  int my_coord[2], MPI_Comm* cart_com
 }
 
 int main(int argc, char** argv) {
-
-    //TODO: implement command line param for this stuff
-    //Let's just assume for now that things are nice and divisible
-    const int n_cols_global = 4096;
-    const int n_rows_global = 4096;
-    const int n_iter = 100;
+    // parsing command-line args
+    int n_iter, n_dims, seed;
+    std::string file_path, save_file;
+    bool file_io_flag;
+    parse_args(argc, argv, n_iter, n_dims, file_path, file_io_flag, save_file, seed);
 
     int dim[2], period[2], reorder;
     int coord[2], id;
@@ -390,6 +389,15 @@ int main(int argc, char** argv) {
     // Get the rank of the process
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if (rank == 0) {
+        // print out to check
+        printf("n_iter: %d | n_dims: %d | seed: %d\n", n_iter, n_dims, seed);
+        // cout required bc C++ doesn't know how to printf strings
+        std::cout << "file_path: " << file_path << std::endl;
+        std::cout << "file_io_flag: " << file_io_flag << std::endl;
+        std::cout << "save_file: " << save_file << std::endl;
+    }
 
     dim[0]=std::sqrt(size); dim[1]=std::sqrt(size);
     period[0]=1; period[1]=1;
@@ -414,21 +422,18 @@ int main(int argc, char** argv) {
 
 
     //TODO: what if this isn't evenly distributed?
-    const int ncols = n_cols_global/dim[0];
-    const int nrows = n_rows_global/dim[1];
+    const int ncols = n_dims/dim[0];
+    const int nrows = n_dims/dim[1];
 
     bool *local_sim = new bool[ncols*nrows];
     bool *local_sim_old = new bool[ncols*nrows];
 
-    std::mt19937 engine(123);
-    auto gen = std::bind(std::uniform_int_distribution<>(0, 1), engine);
-
-    //TODO: file loading here
-    //For now, just random
-    for (int i=0; i < nrows; i++) {
-        for (int j=0; j < ncols; j++) {
-            local_sim[i*ncols + j] = gen();
-        }
+    if (file_path == "") {
+        // no file given, random initialize
+        initialize_board_randomly(local_sim, nrows, ncols, seed);
+    }
+    else {
+        initilize_board_from_file(file_path, local_sim, nrows, ncols);
     }
 
     NeighborData nData(ncols,nrows);
@@ -445,7 +450,7 @@ int main(int argc, char** argv) {
 
     //TODO: take max time like we learned in class here
     if(rank==0){
-        printf("Running a GOL Simulation with %d rows, %d cols, and %d iterations took %f miliseconds\n",n_rows_global,n_cols_global,n_iter,(end-start)*1000);
+        printf("Running a GOL Simulation with %d rows, %d cols, and %d iterations took %f miliseconds\n",n_dims,n_dims,n_iter,(end-start)*1000);
     }
 
 
