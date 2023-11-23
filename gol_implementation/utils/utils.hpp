@@ -5,6 +5,7 @@
 #include <string>
 #include <random>
 #include <functional>
+#include <mpi.h>
 
 // load contents from fname into A
 void from_file(std::string fname, bool* A, int nrows, int ncols);
@@ -21,4 +22,6 @@ void parse_args(int argc, char *argv[], int& n_iter, int& n_dims, std::string& f
                 bool& file_io_flag, std::string& save_file, int& seed);
 void initilize_board_from_file(std::string fname, bool* A, int nrows, int ncols);
 void initialize_board_randomly(bool* A, int nrows, int ncols, int seed);
+void scatter(int num_procs, int id, bool* A, bool* B, int root, int global_n, int dim, int n, MPI_Datatype row_type);
+void gather(int num_procs, int id, bool* A, bool* B, int root, int global_n, int dim, int n, MPI_Datatype row_type);
 #endif

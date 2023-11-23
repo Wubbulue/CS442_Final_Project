@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iterator>
 #include <vector>
+#include <mpi.h>
 
 #include "readin.hpp"
 
@@ -146,3 +147,57 @@ void parse_args(int argc, char *argv[], int& n_iter, int& n_dims, std::string& f
         std::exit(1);
     }
 }
+
+void scatter(int num_procs, int id, bool* A, bool* B, int root, int global_n, int dim, int n, MPI_Datatype row_type)
+{
+    int tag = 0;
+    
+    MPI_Request recv_request;
+    MPI_Irecv(&B[0], n * n, MPI_CXX_BOOL, root, tag, MPI_COMM_WORLD, &recv_request);
+
+    if (id == root) { 
+        MPI_Request* send_requests = new MPI_Request[num_procs];
+	for (int i = 0; i < dim; i++)
+	{
+	    for (int j = 0; j < dim; j++)
+	    {
+		int index = (i*global_n + j) * n;
+		int proc = i*dim + j;
+		MPI_Isend(&A[index], 1, row_type, proc, tag, MPI_COMM_WORLD, &(send_requests[proc]));
+	    }
+	}
+        MPI_Waitall(num_procs, send_requests, MPI_STATUSES_IGNORE);
+    }
+
+    MPI_Wait(&recv_request, MPI_STATUSES_IGNORE);
+    
+    MPI_Barrier(MPI_COMM_WORLD);
+}
+
+void gather(int num_procs, int id, bool* A, bool* B, int root, int global_n, int dim, int n, MPI_Datatype row_type)
+{
+    int tag = 1;
+    
+    MPI_Request send_request;
+    MPI_Isend(&B[0], n * n, MPI_CXX_BOOL, root, tag, MPI_COMM_WORLD, &send_request);
+
+    if (id == root) { 
+        MPI_Request* recv_requests = new MPI_Request[num_procs];
+	for (int i = 0; i < dim; i++)
+	{
+	    for (int j = 0; j < dim; j++)
+	    {
+		int index = (i*global_n + j) * n;
+		int proc = i*dim + j;
+		MPI_Irecv(&A[index], 1, row_type, proc, tag, MPI_COMM_WORLD, &(recv_requests[proc]));
+	    }
+	}
+        MPI_Waitall(num_procs, recv_requests, MPI_STATUSES_IGNORE);
+    }
+
+    MPI_Wait(&send_request, MPI_STATUSES_IGNORE);
+    
+    MPI_Barrier(MPI_COMM_WORLD);
+}
+
+

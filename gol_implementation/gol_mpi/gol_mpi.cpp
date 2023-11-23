@@ -439,20 +439,16 @@ int main(int argc, char** argv) {
     	MPI_Type_vector(n, n, n_dims, MPI_CXX_BOOL, &row_type);
     	MPI_Type_commit(&row_type);
     
-    	MPI_Datatype row_contig_type;
-    	MPI_Type_create_resized(row_type, 0, n*sizeof(bool), &row_contig_type);
-    	MPI_Type_commit(&row_contig_type);
-        
         bool *A;
-        if (rank == 0) {
+        int root = 0;
+        if (rank == root) {
             A = new bool [n*n];
-            initilize_board_from_file(file_path, A, nrows, ncols);
+            initilize_board_from_file(file_path, A, n, n);
         }
          
-        MPI_Scatter(A, 1, row_contig_type, local_sim, n * n, MPI_CXX_BOOL, 0, MPI_COMM_WORLD);
+        scatter(size, rank, A, local_sim, root, n_dims, dim[0], n, row_type);
         
         MPI_Type_free(&row_type);
-        MPI_Type_free(&row_contig_type);
     }
 
     NeighborData nData(ncols,nrows);
