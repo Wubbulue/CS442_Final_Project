@@ -427,18 +427,19 @@ int main(int argc, char** argv) {
 
     bool *local_sim = new bool[ncols*nrows];
     bool *local_sim_old = new bool[ncols*nrows];
+    
+    int n = ncols;
+    MPI_Datatype row_type;
+    MPI_Type_vector(n, n, n_dims, MPI_CXX_BOOL, &row_type);
+    MPI_Type_commit(&row_type);
 
     if (file_path == "") {
         // no file given, random initialize
         initialize_board_randomly(local_sim, nrows, ncols, seed);
     }
     else {
-        int n = ncols;
+
         
-        MPI_Datatype row_type;
-    	MPI_Type_vector(n, n, n_dims, MPI_CXX_BOOL, &row_type);
-    	MPI_Type_commit(&row_type);
-    
         bool *A;
         int root = 0;
         if (rank == root) {
@@ -457,6 +458,16 @@ int main(int argc, char** argv) {
     double start = MPI_Wtime();
     std::memcpy(local_sim_old, local_sim, ncols*nrows*sizeof(bool));
     for (int i=0; i < n_iter; i++) {
+        if (file_io_flag) {
+            bool *A;
+            int root = 0;
+            
+            gather(size, rank, A, local_sim, root, n_dims, dim[0], n, row_type);
+            
+            if (rank == root) {
+                append_to_file(save_file, A, n, n);
+            }
+        }
         nData.communicate(local_sim,neighborRanks, &cart_comm);
         evolve(local_sim, local_sim_old, nrows, ncols,nData);
         memcpy(local_sim_old, local_sim, ncols*nrows*sizeof(bool));
@@ -468,6 +479,7 @@ int main(int argc, char** argv) {
         printf("Running a GOL Simulation with %d rows, %d cols, and %d iterations took %f miliseconds\n",n_dims,n_dims,n_iter,(end-start)*1000);
     }
 
+    MPI_Type_free(&row_type);
 
     // Finalize the MPI environment.
     MPI_Finalize();
