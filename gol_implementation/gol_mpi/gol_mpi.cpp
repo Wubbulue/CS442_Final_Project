@@ -429,9 +429,13 @@ int main(int argc, char** argv) {
     bool *local_sim_old = new bool[ncols*nrows];
     
     int n = ncols;
+    
     MPI_Datatype row_type;
     MPI_Type_vector(n, n, n_dims, MPI_CXX_BOOL, &row_type);
     MPI_Type_commit(&row_type);
+    
+    bool *A;
+    int root = 0;
 
     if (file_path == "") {
         // no file given, random initialize
@@ -439,17 +443,11 @@ int main(int argc, char** argv) {
     }
     else {
 
-        
-        bool *A;
-        int root = 0;
         if (rank == root) {
             A = new bool [n*n];
             initilize_board_from_file(file_path, A, n, n);
-        }
-         
+        }   
         scatter(size, rank, A, local_sim, root, n_dims, dim[0], n, row_type);
-        
-        MPI_Type_free(&row_type);
     }
 
     NeighborData nData(ncols,nrows);
@@ -459,14 +457,8 @@ int main(int argc, char** argv) {
     std::memcpy(local_sim_old, local_sim, ncols*nrows*sizeof(bool));
     for (int i=0; i < n_iter; i++) {
         if (file_io_flag) {
-            bool *A;
-            int root = 0;
-            
-            gather(size, rank, A, local_sim, root, n_dims, dim[0], n, row_type);
-            
-            if (rank == root) {
-                append_to_file(save_file, A, n, n);
-            }
+            //gather(size, rank, A, local_sim, root, n_dims, dim[0], n, row_type);
+            if (rank == root) append_to_file(save_file, A, n, n);
         }
         nData.communicate(local_sim,neighborRanks, &cart_comm);
         evolve(local_sim, local_sim_old, nrows, ncols,nData);
