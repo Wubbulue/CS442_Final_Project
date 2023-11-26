@@ -162,7 +162,7 @@ int main (int argc, char **argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &id); // Get own ID
 
     
-    int global = 4;
+    int global = 100;
     int dim = (int) std::sqrt(num_procs);
     int n = global/dim;
     
@@ -177,7 +177,7 @@ int main (int argc, char **argv) {
         //A = createMatrix(global, global); // Master process creates matrix
         A = createMatrix(global); // Master process creates matrix
         printf("Initial matrix:\n");
-        printArray(A, global*global);
+        //printArray(A, global*global);
     }
 
     //int *B = new int [n * n]; // submatrix will be n by n
@@ -186,7 +186,7 @@ int main (int argc, char **argv) {
     scatter(num_procs, id, A, B, 0, global, dim, n, row_type);  
 
     printf("Process %d received elements: ", id);
-    printArray(B, n * n);
+    //printArray(B, n * n);
     
     if (id == 0) {
         for (int h=0; h<global*global; h++) {
