@@ -454,9 +454,6 @@ int main(int argc, char** argv) {
         scatter(size, rank, A, local_sim, root, n_dims, dim[0], n, row_type);
     }
 
-    // printf("row: %d, col %d\n",my_coord[1],my_coord[0]);
-    // print_matrix(local_sim,nrows,ncols);
-
     NeighborData nData(ncols,nrows);
 
 
@@ -483,7 +480,7 @@ int main(int argc, char** argv) {
     //TODO: take max time like we learned in class here
     if(rank==0){
         printf("Running a GOL Simulation with %d rows, %d cols, and %d iterations took %f miliseconds\n",n_dims,n_dims,n_iter,(end-start)*1000);
-        print_matrix(A,n_dims,n_dims);
+        // print_matrix(A,n_dims,n_dims);
     }
 
     MPI_Type_free(&row_type);
