@@ -162,7 +162,7 @@ void scatter(int num_procs, int id, bool* A, bool* B, int root, int global_n, in
 	    for (int j = 0; j < dim; j++)
 	    {
 		int index = (i*global_n + j) * n;
-		int proc = i*dim + j;
+		int proc = i + j*dim;
 		MPI_Isend(&A[index], 1, row_type, proc, tag, MPI_COMM_WORLD, &(send_requests[proc]));
 	    }
 	}
@@ -188,7 +188,7 @@ void gather(int num_procs, int id, bool* A, bool* B, int root, int global_n, int
 	    for (int j = 0; j < dim; j++)
 	    {
 		int index = (i*global_n + j) * n;
-		int proc = i*dim + j;
+		int proc = i + j*dim;
 		MPI_Irecv(&A[index], 1, row_type, proc, tag, MPI_COMM_WORLD, &(recv_requests[proc]));
 	    }
 	}

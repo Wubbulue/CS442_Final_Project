@@ -73,27 +73,27 @@ struct NeighborData{
         s_bottom_right_cell = local_sim[(nrows-1)*ncols+(ncols-1)];
 
         //Send Rows and Cols
-        MPI_Isend(s_above_row, ncols, MPI_C_BOOL, nRnks.above, tag, *cart_comm, reqs);
-        MPI_Isend(s_below_row, ncols, MPI_C_BOOL, nRnks.bottom, tag, *cart_comm, reqs+1);
-        MPI_Isend(s_right_col, nrows, MPI_C_BOOL, nRnks.right, tag, *cart_comm, reqs+2);
-        MPI_Isend(s_left_col, nrows, MPI_C_BOOL, nRnks.left, tag, *cart_comm, reqs+3);
+        MPI_Isend(s_above_row, ncols, MPI_C_BOOL, nRnks.above, above_row_tag, *cart_comm, reqs);
+        MPI_Isend(s_below_row, ncols, MPI_C_BOOL, nRnks.bottom, below_row_tag, *cart_comm, reqs+1);
+        MPI_Isend(s_right_col, nrows, MPI_C_BOOL, nRnks.right, right_col_tag, *cart_comm, reqs+2);
+        MPI_Isend(s_left_col, nrows, MPI_C_BOOL, nRnks.left, left_col_tag, *cart_comm, reqs+3);
 
         //Send Corners
-        MPI_Isend(&s_top_left_cell, 1, MPI_C_BOOL, nRnks.topleft, tag, *cart_comm, reqs+4);
-        MPI_Isend(&s_top_right_cell, 1, MPI_C_BOOL, nRnks.topright, tag, *cart_comm, reqs+5);
-        MPI_Isend(&s_bottom_left_cell, 1, MPI_C_BOOL, nRnks.bottomleft, tag, *cart_comm, reqs+6);
-        MPI_Isend(&s_bottom_right_cell, 1, MPI_C_BOOL, nRnks.bottomright, tag, *cart_comm, reqs+7);
+        MPI_Isend(&s_top_left_cell, 1, MPI_C_BOOL, nRnks.topleft, top_left_tag, *cart_comm, reqs+4);
+        MPI_Isend(&s_top_right_cell, 1, MPI_C_BOOL, nRnks.topright, top_right_tag, *cart_comm, reqs+5);
+        MPI_Isend(&s_bottom_left_cell, 1, MPI_C_BOOL, nRnks.bottomleft, bottom_left_tag, *cart_comm, reqs+6);
+        MPI_Isend(&s_bottom_right_cell, 1, MPI_C_BOOL, nRnks.bottomright, bottom_right_tag, *cart_comm, reqs+7);
 
         //Receive Rows and Cols
-        MPI_Irecv(r_above_row, ncols, MPI_C_BOOL, nRnks.above, tag, *cart_comm, reqs+8);
-        MPI_Irecv(r_below_row, ncols, MPI_C_BOOL, nRnks.bottom, tag, *cart_comm, reqs+9);
-        MPI_Irecv(r_right_col, nrows, MPI_C_BOOL, nRnks.right, tag, *cart_comm, reqs+10);
-        MPI_Irecv(r_left_col, nrows, MPI_C_BOOL, nRnks.left, tag, *cart_comm, reqs+11);
+        MPI_Irecv(r_above_row, ncols, MPI_C_BOOL, nRnks.above, below_row_tag, *cart_comm, reqs+8);
+        MPI_Irecv(r_below_row, ncols, MPI_C_BOOL, nRnks.bottom, above_row_tag, *cart_comm, reqs+9);
+        MPI_Irecv(r_right_col, nrows, MPI_C_BOOL, nRnks.right, left_col_tag, *cart_comm, reqs+10);
+        MPI_Irecv(r_left_col, nrows, MPI_C_BOOL, nRnks.left, right_col_tag, *cart_comm, reqs+11);
 
-        MPI_Irecv(&r_top_left_cell, 1, MPI_C_BOOL, nRnks.topleft, tag, *cart_comm, reqs+12);
-        MPI_Irecv(&r_top_right_cell, 1, MPI_C_BOOL, nRnks.topright, tag, *cart_comm, reqs+13);
-        MPI_Irecv(&r_bottom_left_cell, 1, MPI_C_BOOL, nRnks.bottomleft, tag, *cart_comm, reqs+14);
-        MPI_Irecv(&r_bottom_right_cell, 1, MPI_C_BOOL, nRnks.bottomright, tag, *cart_comm, reqs+15);
+        MPI_Irecv(&r_top_left_cell, 1, MPI_C_BOOL, nRnks.topleft, bottom_right_tag, *cart_comm, reqs+12);
+        MPI_Irecv(&r_top_right_cell, 1, MPI_C_BOOL, nRnks.topright, bottom_left_tag, *cart_comm, reqs+13);
+        MPI_Irecv(&r_bottom_left_cell, 1, MPI_C_BOOL, nRnks.bottomleft, top_right_tag, *cart_comm, reqs+14);
+        MPI_Irecv(&r_bottom_right_cell, 1, MPI_C_BOOL, nRnks.bottomright, top_left_tag, *cart_comm, reqs+15);
 
         MPI_Waitall(16, reqs, MPI_STATUS_IGNORE);
     }
@@ -115,7 +115,14 @@ struct NeighborData{
 
     MPI_Request reqs[16];
 
-    int tag = 1234;
+    int above_row_tag = 1,
+        below_row_tag = 2, 
+        right_col_tag = 3, 
+        left_col_tag = 4, 
+        top_left_tag = 5,
+        top_right_tag=6,
+        bottom_right_tag = 7,
+        bottom_left_tag=8;
 };
 
 // get the number of neighbors alive for a given cell (row/col)
@@ -403,7 +410,7 @@ int main(int argc, char** argv) {
     period[0]=1; period[1]=1;
 
     //Idk if this should be true or false
-    reorder=0;
+    reorder=1;
 
     MPI_Comm cart_comm;
 
@@ -434,19 +441,28 @@ int main(int argc, char** argv) {
     MPI_Type_vector(n, n, n_dims, MPI_CXX_BOOL, &row_type);
     MPI_Type_commit(&row_type);
     
-    bool *A = new bool [n_dims*n_dims];;
+    bool *A = new bool [n_dims*n_dims];
     int root = 0;
 
     if (file_path == "") {
         // no file given, random initialize
-        initialize_board_randomly(local_sim, nrows, ncols, seed);
+        if (rank == root) initialize_board_randomly(A, n_dims, n_dims, seed);
+        scatter(size, rank, A, local_sim, root, n_dims, dim[0], n, row_type);
     }
     else {
         if (rank == root) initilize_board_from_file(file_path, A, n_dims, n_dims);
         scatter(size, rank, A, local_sim, root, n_dims, dim[0], n, row_type);
     }
 
+    // printf("row: %d, col %d\n",my_coord[1],my_coord[0]);
+    // print_matrix(local_sim,nrows,ncols);
+
     NeighborData nData(ncols,nrows);
+
+
+    if(rank==root){
+		initialize_file(save_file, n_iter,n_dims,n_dims);
+    }
 
 
     double start = MPI_Wtime();
@@ -462,9 +478,12 @@ int main(int argc, char** argv) {
     }
     double end = MPI_Wtime();
 
+    gather(size, rank, A, local_sim, root, n_dims, dim[0], n, row_type);
+
     //TODO: take max time like we learned in class here
     if(rank==0){
         printf("Running a GOL Simulation with %d rows, %d cols, and %d iterations took %f miliseconds\n",n_dims,n_dims,n_iter,(end-start)*1000);
+        print_matrix(A,n_dims,n_dims);
     }
 
     MPI_Type_free(&row_type);

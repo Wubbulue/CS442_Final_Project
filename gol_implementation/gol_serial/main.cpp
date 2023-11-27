@@ -50,14 +50,13 @@ int main(int argc, char** argv) {
     }
 
     
-    std::string out_filename = "out_test.mat";
     if (writeToFile) {
-		initialize_file(out_filename, n_iterations,nrows,ncols);
+		initialize_file(save_file, n_iterations,nrows,ncols);
     }
 
 
     time_point<Clock> start = Clock::now();
-    run(A, n_iterations, nrows, ncols, writeToFile, false, out_filename);
+    run(A, n_iterations, nrows, ncols, writeToFile, false, save_file);
     time_point<Clock> end = Clock::now();
     milliseconds diff = duration_cast<milliseconds>(end - start);
     std::cout << "Simulation took: " << diff.count() << " miliseconds" << std::endl;
