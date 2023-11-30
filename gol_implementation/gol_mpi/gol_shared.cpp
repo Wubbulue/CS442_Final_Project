@@ -279,6 +279,9 @@ int main(int argc, char** argv) {
 
     double start = MPI_Wtime();
     for (int i=0; i < n_iter; i++) {
+        if (file_io_flag) {
+            if (rank == root) append_to_file(save_file, global_sim, n_dims, n_dims);
+        }
         update_local(global_sim, global_sim_old, local_len, sub_row, sub_col, n_dims);
         MPI_Barrier(MPI_COMM_WORLD);
         if(rank==0){
