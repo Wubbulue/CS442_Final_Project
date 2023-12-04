@@ -7,6 +7,7 @@ yproc1 = [563,2276,9168,37020,148715,591909]
 yproc4 = [196.211918,627.864927,2354.994699,9355.517531,37710.128990,152349.691746]
 yproc16 = [85.906608,194.270004,658.120969,2494.560939,9911.096148,40756.708791]
 yproc64 = [122.133957, 146.707054,256.279779,736.280016,2565.692906,10047.984399]
+yshm = [163.540762,635.596914, 2568.209545, 10324.706500, 41396.629173, 165584.079762]
 
 
 #use this if you want to convert all times from miliseconds to seconds
@@ -23,22 +24,24 @@ x = [256, 512, 1024, 2048, 4096, 8192]
 #x = [0,1,2,3,4,5]
 
 plt.yscale("log")
-plt.plot(x,yproc1)
-plt.plot(x,yproc4)
-plt.plot(x,yproc16)
-plt.plot(x,yproc64)
+plt.plot(x,yproc1, 'b')
+plt.plot(x,yproc4, 'r-')
+plt.plot(x,yproc16, 'g')
+plt.plot(x,yproc64, 'purple')
+plt.plot(x,yshm, 'r--')
 
 
 legenditems = []
-legenditems.append("Serial Implementation")
-legenditems.append("Proc size 4")
-legenditems.append("Proc size 16")
-legenditems.append("Proc size 64")
+legenditems.append("Serial")
+legenditems.append("4 processes")
+legenditems.append("16 processes")
+legenditems.append("64 processes")
+legenditems.append("4 processes - shared memory")
 plt.legend(legenditems)
-plt.xlabel('Dimensions of Board')
-plt.ylabel('time to compete')
+plt.xlabel('Board Dimension')
+plt.ylabel('Time to complete (ms)')
 
-plt.title('Time to run 1000 iterations of game of life')
+plt.title('Game of Life - 1000 iterations')
 plt.show()
 
 
@@ -50,25 +53,26 @@ ysharedio = [1585.989569, 9676.838933, 16332.876709, 33970.637465, 128614.502023
 
 #plt.xscale("log")
 plt.yscale("log")
-plt.plot(x,yproc1io)
-plt.plot(x,yproc4io)
-plt.plot(x,yproc16io)
-plt.plot(x,yproc64io)
-plt.plot(x,ysharedio)
+plt.plot(x,yproc1io, 'b')
+plt.plot(x,yproc4io, 'r-')
+plt.plot(x,yproc16io, 'g')
+plt.plot(x,yproc64io, 'purple')
+plt.plot(x,ysharedio, 'r--')
 
 
 legenditems = []
-legenditems.append("Serial Implementation")
-legenditems.append("Proc size 4")
-legenditems.append("Proc size 16")
-legenditems.append("Proc size 64")
+legenditems.append("Serial")
+legenditems.append("4 processes")
+legenditems.append("16 processes")
+legenditems.append("64 processes")
 legenditems.append("4 processes - shared memory")
 
 plt.legend(legenditems)
-plt.xlabel('Dimensions of Board')
-plt.ylabel('Time to compete (ms)')
+plt.xlabel('Board Dimension')
+plt.ylabel('Time to complete (ms)')
 
-plt.title('Time to run 1000 iterations of game of life with IO')
+
+plt.title('Game of Life - 1000 iterations - IO')
 plt.show()
 
 
@@ -81,11 +85,11 @@ ysharedio = [y*4 for y in ysharedio]
 
 #plt.xscale("log")
 plt.yscale("log")
-plt.plot(x,yproc1io)
-plt.plot(x,yproc4io)
-plt.plot(x,yproc16io)
-plt.plot(x,yproc64io)
-plt.plot(x,ysharedio)
+plt.plot(x,yproc1io, 'b')
+plt.plot(x,yproc4io, 'r-')
+plt.plot(x,yproc16io, 'g')
+plt.plot(x,yproc64io, 'purple')
+plt.plot(x,ysharedio, 'r--')
 
 
 legenditems = []
@@ -96,8 +100,9 @@ legenditems.append("64 processes")
 legenditems.append("4 processes - shared memory")
 
 plt.legend(legenditems)
-plt.xlabel('Dimensions of Board')
+plt.xlabel('Board Dimension')
 plt.ylabel('Time to complete (ms)')
+
 
 plt.title('1000 iterations of game of life with IO normalized')
 plt.show()
