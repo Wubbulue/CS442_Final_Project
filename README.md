@@ -1,6 +1,7 @@
 # Parallelizing Game of Life
 ### CS 442/542 Final Project
 
+<img src="https://github.com/Wubbulue/CS442_Final_Project/blob/main/example_video.gif" title="Simulation rendered using our code!" width="256" height="256" />
 
 By Anthony Sharma, Jack Wickstrom, Ben Ogden, and Jack Ringer
 
